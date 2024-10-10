@@ -1,0 +1,124 @@
+##### server configuration section #####
+#listen: localhost:8088        # 建议修改为具体的ip:port
+listen: 0.0.0.0:8088        # 建议修改为具体的ip:port
+# listen:
+# - localhost:8088            # 监听本机环回地址
+# - http://localhost:8088     # 监听本机环回地址
+# - 0.0.0.0:8088              # 监听本机所有地址 (INADDR_ANY)
+# 协议可配置 http 或者 https，默认为http
+# port: 1-65535(Window系统)/ 1024-65535(Linux或Mac系统）
+
+##### server https certificate section #####
+# 可选，listen 为 https 协议时必须配置
+https_key: ''                 # https 服务使用的 key 的路径  (不配置默认为'')
+https_cert: ''                # https 服务使用的 crt 的路径  (不配置默认为'')
+
+##### server deploy root section #####
+deploy_root: ''                # 安装根目录 (不配置默认为 `<现有用户home目录>/ohpm-repo`)，只支持绝对路径，且路径目录必须存在
+
+##### server numeric limit section #####
+max_package_size: 300          # 上传包大小限制，单位是MB (0, 300]，不配置默认为 300
+max_extract_size: 800          # 压缩包解压后大小限制，单位是MB，不配置默认为 800
+max_extract_file_num: 30000    # 压缩包解压后文件个数限制，不配置默认为 30000
+user_rate_limit: 100           # 用户访问频率控制，单位是次/小时 (0, 10000]，不配置默认为 100
+fetch_timeout: 60              # 请求/响应的超时时间，单位是秒 (0, 3600]，不配置默认为 60
+keep_alive_timeout: 60         # TCP 保持连接的超时时间，单位是秒 (0, 3600]，不配置默认为 60
+api_timeout: 60                # api超时时间，单位是秒(0, 3600]，不配置默认为 60
+upload_lock_hour: 24           # 下架某一三方包所有版本后，限时禁止同名三方包上传，单位是小时 (0, 168]，不配置，默认为 24
+upload_max_times: 100          # 单用户24小时内上传次数限制 (0, 100000]，不配置默认为 100
+operation_log_retention: 100   # 数据库中操作日志保留时间，单位是天，不配置默认为 100
+##### metadata storage section #####
+## 元数据存储类型 filedb 和 mysql 二选一，不可都配置
+db:                         # 必须用 yaml 数组形式写法
+  type: filedb
+  config:                   # 如果想修改存储路径且保留旧的数据，则需要把旧路径下的数据文件迁移至新路径
+    #path: ./db              # 本地数据存储路径，不配置默认为<deploy_root>/db;
+    path: /data/db              # 本地数据存储路径，不配置默认为<deploy_root>/db;
+
+#db:                        # 必须用yaml数组形式写法
+#  type: mysql
+#  config:
+#    host: "localhost"      # 数据库主机地址
+#    port: 3306             # 数据库端口 (0,65535]
+#    username: tctAdmin         # 数据库的用户名
+#    password: "password"   # 数据库的用户密码（请配置明文, 最终在部署目录中会转换为密文）
+#    database: "repo"       # 数据库名
+
+##### storage section #####
+## 文件存储类型 fs、sftp 和 custom 三选一，不可多选
+store:                               # 必须用 yaml 数组形式写法
+  type: fs
+  config:                            # 上传资源后如若要修改存储路径，则需要把旧路径下的数据迁移至新路径中
+    #path: ./storage                  # 本地文件存储路径，不配置默认为 <deploy_root>/storage;
+    path: /data/storage                  # 本地文件存储路径，不配置默认为 <deploy_root>/storage;
+    #server: http://localhost:8088   # 仓库下载链接地址，不配置取默认值
+
+## 文件存储类型为 sftp 时，最多配置三个 sftp
+#store:                               # 必须用 yaml 数组形式写法
+#  type: sftp                         # 当且仅当 db 的类型为 mysql 时，store 的类型才能为 sftp
+#  config:
+#    location:
+#      -
+#        name: test_one_sftp          # 主机名字名字不能与其他sftp配置重复
+#        host: "localhost"            # 主机地址
+#        port: 22                     # 主机端口 (0,65535]
+#        read_username: "read"        # 主机有读权限的用户名字
+#        read_password: "password"    # 主机有读权限的用户密码（请配置明文, 最终在部署目录中会转换为密文）
+#        write_username: "write"      # 主机有写权限的用户名字
+#        write_password: "password"   # 主机有写权限的用户密码（请配置明文, 最终在部署目录中会转换为密文）
+#        path: /source22              # 相对 sftp 根目录的文件路径，仅限/开头，且路径文件夹必须存在
+#      -
+#        name: test_two_sftp
+#        host: "localhost"
+#        port: 24
+#        read_username: "read"
+#        read_password: "password"
+#        write_username: "write"
+#        write_password: "password"
+#        path: /source24
+#    #server: http://localhost:8088   # 仓库下载链接地址，不配置取默认值
+
+# 文件存储类型为 custom 时，db 的类型需要为 mysql
+#store:
+#  type: custom                                            # custom是自定义存储插件类型，自定义存储插件开发流程见官方文档
+#  config:
+#    export_name: CustomStorage                            # 插件export的类名
+#    plugin_path: plugins/CustomStorage.js                 # 插件的绝对路径或者相对于ohpm-repo软件包的路径，建议将插件放在软件包的plugins目录下
+#    custom_field: "test"                                  # 自定义字段，通过引入libs/common/getStorageConfigInfo.js的getStorageConfigInfo方法获取自定义字段的值
+#    #server: http://localhost:8088                        # 仓库下载链接地址，不配置取默认值
+
+##### 是否使用反向代理 #####
+# 可选项:true,false, 默认：false。如果使用反向代理，需要配置为true，客户端IP地址将从请求头中的X-Forwarded-For字段获取
+use_reverse_proxy: false
+
+##### uplink section #####
+uplink_cache_path: ./uplink      # 缓存路径，不配置默认为 <deploy_root>/uplink
+uplink_cache_time: 168           # 远程包 metadata 缓存时间，单位为小时，默认 168 小时，取值范围为 (0, 8760]
+
+##### log section #####
+logs_path: ./logs                # 日志路径，不配置默认为 <deploy_root>/logs
+
+##### log level section #####
+# 日志级别: 级别由低到高分别是 all、trace、debug、info、warn、error、fatal、mark、off
+# run，operate 和 access 不配置或者配置错误，默认为 info
+loglevel_run: info
+loglevel_operate: info
+loglevel_access: info
+
+##### auth plugin section #####
+# 可选项，自定义认证插件配置，自定义插件开发流程见官方文档
+#auth_plugin:
+#  name: CustomAuth              # 认证插件的名字
+#  path: plugins/CustomAuth.js   # 插件的绝对路径或者相对于ohpm-repo软件包的路径，建议将插件放在软件包的plugins目录下
+
+##### compatibleSdkVersion等兼容性字段检测日志等级 #####
+# 可选值：close、info、warn、error，默认：warn
+compability_log_level: warn
+
+##### 是否允许下架被其他组件依赖的包 #####
+# 可选项:true,false, 默认：false
+allow_remove_depended_packages: false
+
+##### 是否使用文件上传新接口 #####
+# 可选项:true,false, 默认：true
+allow_new_file_upload_api: true

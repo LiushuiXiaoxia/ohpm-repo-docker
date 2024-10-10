@@ -1,0 +1,13 @@
+volumes:
+  repo_data:
+
+services:
+  ohpm-repo:
+    image: ohpm-repo
+    container_name: ohpm-repo
+    ports:
+      - 8088:8088
+    volumes:
+      - "./data:/data"
+      - "./app:/app"
+    command: bash /app/start.sh
