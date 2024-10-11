@@ -13,9 +13,11 @@ start: setup
 	docker-compose up -d
 	sleep 10 && docker logs ohpm-repo
 	sleep 10 && docker logs ohpm-repo
+	echo "ohpm repo service start success"
 
 stop:
 	docker-compose down
+	echo "ohpm repo service stop success"
 
 test: setup
 	docker-compose down && docker-compose up
