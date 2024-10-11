@@ -11,8 +11,8 @@ setup:
 
 start: setup
 	docker-compose up -d
-	sleep 10 && docker logs  ohpm-repo
-	sleep 10 && docker logs  ohpm-repo
+	sleep 10 && docker logs ohpm-repo
+	sleep 10 && docker logs ohpm-repo
 
 stop:
 	docker-compose down
