@@ -16,11 +16,18 @@ start: setup
 	echo "ohpm repo service start success"
 
 stop:
-	docker-compose down
+	docker-compose stop
 	echo "ohpm repo service stop success"
+
+down:
+	docker-compose down
+	echo "ohpm repo service down success"
 
 test: setup
 	docker-compose down && docker-compose up
 
 log:
 	docker logs -f ohpm-repo
+
+shell:
+	docker exec -it ohpm-repo bash
